@@ -198,10 +198,10 @@ regdata-platform/
 
 | Проект | Фокус | Отличия RegData |
 |--------|-------|-----------------|
-| **Our World in Data** | Общая статистика | Специализация на экономической свободе |
-| **World Bank Data Portal** | Официальная статистика | Интеграция из разных источников |
-| **The Global Economy** | Широкий набор показателей | Глубокий корреляционный анализ |
-| **OECD Data Explorer** | Страны ОЭСР | Глобальное покрытие |
+| **Our World in Data** | Общая статистика | Специализация на экономической свободе - https://ourworldindata.org/|
+| **World Bank Data Portal** | Официальная статистика | Интеграция из разных источников - https://data.worldbank.org/ |
+| **The Global Economy** | Широкий набор показателей | Глубокий корреляционный анализ - https://www.theglobaleconomy.com/ |
+| **OECD Data Explorer** | Страны ОЭСР | Глобальное покрытие - https://data.oecd.org/  |
 
 
 
