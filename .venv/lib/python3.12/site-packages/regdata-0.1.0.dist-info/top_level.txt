@@ -1,1 +1,0 @@
-regdata_core
