@@ -26,24 +26,16 @@
 
 ### Модульная структура
 ```
-regdata-platform/
-├── data_processing/          # Модули обработки данных
-│   ├── data_collector.py     # Сбор данных из внешних источников
-│   ├── data_cleaner.py       # Очистка и нормализация
-│   └── data_integrator.py    # Интеграция разнородных данных
-├── analytics/                # Аналитические модули
-│   ├── correlation_engine.py # Расчет корреляций
-│   ├── trend_analyzer.py     # Анализ временных рядов
-│   └── comparative_analysis.py # Сравнительный анализ
-├── visualization/            # Визуализация
-│   ├── map_visualizer.py     # Интерактивная карта
-│   ├── chart_generator.py    # Генератор графиков
-│   └── dashboard_builder.py  # Построение дашбордов
-├── web_app/                  # Веб-приложение
-│   └── app.py               # Основное приложение Streamlit
-└── database/                 # Управление данными
-    ├── models.py            # Модели данных
-    └── repository.py        # Доступ к данным
+RegData/
+│
+├── app/                  # Веб-интерфейс на Streamlit
+├── data/                 # Исходные и обработанные данные
+├── src/                  # Логика обработки данных и аналитики
+│
+├── dashboard.ipynb       # Jupyter-ноутбук для первичного анализа
+├── requirements.txt      # Список зависимостей
+├── pyproject.toml        # Конфигурация проекта
+└── README.md
 ```
 
 ### Технологический стек
