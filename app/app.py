@@ -1,38 +1,26 @@
+from pathlib import Path
+
 import streamlit as st
-import pandas as pd
-import numpy as np
-import plotly.express as px
 
-st.set_page_config(page_title="RegData", layout="wide")
 
-st.title("RegData — Economic Freedom Visualizer (MVP)")
-st.caption("MVP: каркас приложения + демо-визуализации. Далее подключим реальные данные (EFI/WDI).")
+APP_DIR = Path(__file__).resolve().parent
+PAGES_DIR = APP_DIR / "pages"
 
-st.divider()
+# Центральная точка навигации: здесь просто собираются все страницы приложения.
+navigation = st.navigation(
+    [
+        st.Page(APP_DIR / "home.py", title="Главная", icon=":material/home:"),
+        st.Page(PAGES_DIR / "1_Обзор.py", title="Обзор", icon=":material/insights:"),
+        st.Page(PAGES_DIR / "2_Карта.py", title="Карта", icon=":material/public:"),
+        st.Page(PAGES_DIR / "3_Страна.py", title="Страна", icon=":material/flag:"),
+        st.Page(PAGES_DIR / "4_Корреляция.py", title="Корреляция", icon=":material/scatter_plot:"),
+        st.Page(PAGES_DIR / "5_Временные_ряды.py", title="Временные ряды", icon=":material/show_chart:"),
+        st.Page(PAGES_DIR / "6_Экономическая_свобода.py", title="Экономическая свобода", icon=":material/trending_up:"),
+        st.Page(PAGES_DIR / "7_Клубы_конвергенции.py", title="Клубы конвергенции", icon=":material/hub:"),
+        st.Page(PAGES_DIR / "8_Конструктор_индекса.py", title="Конструктор индекса", icon=":material/tune:"),
+        st.Page(PAGES_DIR / "9_Прогноз_индекса.py", title="Прогноз индекса", icon=":material/auto_graph:"),
+    ]
+)
 
-col1, col2 = st.columns([1, 2])
-
-with col1:
-    st.subheader("Параметры")
-    year = st.slider("Год", 2000, 2024, 2019)
-    metric = st.selectbox("Показатель", ["EFI (demo)", "GDP per capita (demo)", "Inflation (demo)"])
-
-with col2:
-    st.subheader("Демо-данные (заглушка)")
-    np.random.seed(42)
-    countries = ["USA", "GBR", "DEU", "FRA", "CHN", "IND", "BRA", "RUS", "JPN", "CAN"]
-    df = pd.DataFrame({
-        "country": countries,
-        "value": np.random.normal(70, 10, size=len(countries)).clip(0, 100),
-        "year": year,
-        "metric": metric
-    })
-    st.dataframe(df, use_container_width=True)
-
-st.divider()
-st.subheader("Простейшая визуализация (MVP-график)")
-
-fig = px.bar(df, x="country", y="value", title=f"{metric} — {year}")
-st.plotly_chart(fig, use_container_width=True)
-
-st.info("Следующий шаг: подключаем реальный датасет и делаем страницы: Карта / Страна / Корреляции / Временные ряды.")
+# Дальше Streamlit уже сам открывает выбранную страницу.
+navigation.run()
