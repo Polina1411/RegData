@@ -6,7 +6,7 @@ import plotly.express as px
 import streamlit as st
 
 from regdata_core.app_helpers import build_analytics_dataset, build_country_lookup, country_label, metrics_for_df
-from regdata_core.data_processing.cache import COUNTRIES_PATH, OECD_RECENT_PATH, WDI_PATH, load_parquet
+from regdata_core.data_processing.cache import COUNTRIES_PATH, OECD_RECENT_PATH, WDI_PATH, file_version, load_parquet
 from regdata_core.visualization.ui import apply_app_style, metric_label, render_hero, render_note, render_panel
 
 
@@ -17,13 +17,13 @@ CURRENT_YEAR = date.today().year
 
 
 @st.cache_data
-def load_wdi_cached(path_str: str) -> pd.DataFrame:
+def load_wdi_cached(path_str: str, _version: int) -> pd.DataFrame:
     # Главная страница часто перерисовывается, поэтому данные кэшируем сразу.
     return load_parquet(Path(path_str))
 
 
 @st.cache_data
-def load_optional_parquet(path_str: str) -> pd.DataFrame:
+def load_optional_parquet(path_str: str, _version: int) -> pd.DataFrame:
     path = Path(path_str)
     if not path.exists():
         return pd.DataFrame()
@@ -31,7 +31,7 @@ def load_optional_parquet(path_str: str) -> pd.DataFrame:
 
 
 @st.cache_data
-def load_countries_cached(path_str: str) -> pd.DataFrame:
+def load_countries_cached(path_str: str, _version: int) -> pd.DataFrame:
     path = Path(path_str)
     if not path.exists():
         return pd.DataFrame(columns=["iso3", "country"])
@@ -54,12 +54,12 @@ with hero_left:
     st.markdown(" ")
     if WDI_PATH.exists():
         # На главной показываем уже собранный аналитический датасет, а не сырые куски по отдельности.
-        wdi = load_wdi_cached(str(WDI_PATH))
+        wdi = load_wdi_cached(str(WDI_PATH), file_version(WDI_PATH))
         wdi = build_analytics_dataset(
             wdi,
-            load_optional_parquet(str(OECD_RECENT_PATH)),
+            load_optional_parquet(str(OECD_RECENT_PATH), file_version(OECD_RECENT_PATH)),
         )
-        countries = load_countries_cached(str(COUNTRIES_PATH))
+        countries = load_countries_cached(str(COUNTRIES_PATH), file_version(COUNTRIES_PATH))
         country_lookup = build_country_lookup(countries)
         metrics = metrics_for_df(wdi)
         available_years = wdi["year"].dropna().astype(int)

@@ -26,6 +26,7 @@ from regdata_core.data_processing.cache import (
     EFI_PATH,
     RAW_COUNTRIES_GEOJSON_PATH,
     LIGHT_COUNTRIES_GEOJSON_PATH,
+    file_version,
     save_parquet,
     load_parquet,
 )
@@ -89,11 +90,11 @@ with colB:
         render_note("Индекс экономической свободы подключён автоматически и доступен как отдельный показатель.")
 
 @st.cache_data
-def load_wdi_cached(path_str: str) -> pd.DataFrame:
+def load_wdi_cached(path_str: str, _version: int) -> pd.DataFrame:
     return load_parquet(Path(path_str))
 
 @st.cache_data
-def load_geojson_cached(path_str: str) -> dict:
+def load_geojson_cached(path_str: str, _version: int) -> dict:
     with open(path_str, "r", encoding="utf-8") as f:
         return json.load(f)
 
@@ -153,12 +154,12 @@ if not RAW_COUNTRIES_GEOJSON_PATH.exists():
 with st.spinner("Подготовка карты..."):
     geojson_path = ensure_lightweight_geojson()
 
-wdi = load_wdi_cached(str(WDI_PATH))
+wdi = load_wdi_cached(str(WDI_PATH), file_version(WDI_PATH))
 oecd_recent = load_parquet(OECD_RECENT_PATH) if OECD_RECENT_PATH.exists() else pd.DataFrame()
 wdi = build_analytics_dataset(wdi, oecd_recent)
 countries = load_parquet(COUNTRIES_PATH) if COUNTRIES_PATH.exists() else pd.DataFrame(columns=["iso3", "country"])
 country_lookup = build_country_lookup(countries)
-geojson = load_geojson_cached(str(geojson_path))
+geojson = load_geojson_cached(str(geojson_path), file_version(geojson_path))
 
 available_years = wdi["year"].dropna().astype(int)
 max_available_year = int(available_years.max()) if not available_years.empty else CURRENT_YEAR

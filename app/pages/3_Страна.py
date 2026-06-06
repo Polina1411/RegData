@@ -15,7 +15,7 @@ from regdata_core.app_helpers import (
     latest_year_with_value,
     metrics_for_df,
 )
-from regdata_core.data_processing.cache import WDI_PATH, COUNTRIES_PATH, OECD_RECENT_PATH, load_parquet
+from regdata_core.data_processing.cache import WDI_PATH, COUNTRIES_PATH, OECD_RECENT_PATH, file_version, load_parquet
 from regdata_core.visualization.ui import apply_app_style, render_hero, render_note, metric_label
 
 
@@ -29,12 +29,12 @@ render_hero(
 )
 
 @st.cache_data
-def load_wdi_cached(path_str: str) -> pd.DataFrame:
+def load_wdi_cached(path_str: str, _version: int) -> pd.DataFrame:
     return load_parquet(Path(path_str))
 
 
 @st.cache_data
-def load_countries_cached(path_str: str) -> pd.DataFrame:
+def load_countries_cached(path_str: str, _version: int) -> pd.DataFrame:
     path = Path(path_str)
     if not path.exists():
         return pd.DataFrame(columns=["iso3", "country"])
@@ -45,13 +45,13 @@ if not WDI_PATH.exists():
     st.warning("Данные WDI не найдены. Сначала открой страницу карты и обнови данные.")
     st.stop()
 
-wdi = load_wdi_cached(str(WDI_PATH))
+wdi = load_wdi_cached(str(WDI_PATH), file_version(WDI_PATH))
 wdi = build_analytics_dataset(
     wdi,
     load_parquet(OECD_RECENT_PATH) if OECD_RECENT_PATH.exists() else pd.DataFrame(),
 )
 METRICS = metrics_for_df(wdi)
-countries = load_countries_cached(str(COUNTRIES_PATH))
+countries = load_countries_cached(str(COUNTRIES_PATH), file_version(COUNTRIES_PATH))
 country_lookup = build_country_lookup(countries)
 iso_options = country_options(wdi, country_lookup)
 

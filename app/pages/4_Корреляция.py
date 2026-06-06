@@ -5,7 +5,7 @@ import pandas as pd
 import plotly.express as px
 
 from regdata_core.app_helpers import build_analytics_dataset, build_country_lookup, country_label, country_options, metrics_for_df
-from regdata_core.data_processing.cache import WDI_PATH, OECD_RECENT_PATH, load_parquet
+from regdata_core.data_processing.cache import WDI_PATH, OECD_RECENT_PATH, COUNTRIES_PATH, file_version, load_parquet
 from regdata_core.visualization.ui import apply_app_style, render_hero, render_note, metric_label
 
 st.set_page_config(page_title="RegData — Корреляция", layout="wide")
@@ -21,23 +21,21 @@ if not WDI_PATH.exists():
     st.stop()
 
 @st.cache_data
-def load_wdi():
+def load_wdi(_version: int):
     return load_parquet(WDI_PATH)
 
 @st.cache_data
-def load_countries():
-    from regdata_core.data_processing.cache import COUNTRIES_PATH
-
+def load_countries(_version: int):
     if COUNTRIES_PATH.exists():
         return load_parquet(COUNTRIES_PATH)
     return pd.DataFrame(columns=["iso3", "country"])
 
-wdi = load_wdi()
+wdi = load_wdi(file_version(WDI_PATH))
 wdi = build_analytics_dataset(
     wdi,
     load_parquet(OECD_RECENT_PATH) if OECD_RECENT_PATH.exists() else pd.DataFrame(),
 )
-countries = load_countries()
+countries = load_countries(file_version(COUNTRIES_PATH))
 country_lookup = build_country_lookup(countries)
 
 st.subheader("Параметры")
