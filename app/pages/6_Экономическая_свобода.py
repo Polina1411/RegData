@@ -122,9 +122,8 @@ if not df_year.empty:
     top_country_name = df_year.sort_values("efi_total", ascending=False).iloc[0]["Страна"]
     bottom_country_name = df_year.sort_values("efi_total", ascending=True).iloc[0]["Страна"]
     render_note(
-        f"Краткий вывод для защиты: в {year} году лидер по индексу экономической свободы — {top_country_name}, "
-        f"а нижняя часть распределения замыкается страной {bottom_country_name}. "
-        "Это даёт наглядный срез различий в качестве институтов и экономической среды между странами."
+        f"В {year} году лидер по индексу экономической свободы — {top_country_name}, "
+        f"а нижнюю часть распределения замыкает {bottom_country_name}."
     )
 
 left, right = st.columns([1.25, 1])
@@ -200,9 +199,6 @@ fig_mean.update_traces(
 st.plotly_chart(fig_mean, use_container_width=True)
 
 st.subheader("Динамика стран")
-render_note(
-    "Здесь индекс рассматривается как временной ряд: кто почти не меняется, у кого плавный рост, а у кого динамика заметно более резкая."
-)
 
 if dynamics_df.empty:
     st.info("Для выбранного периода недостаточно данных, чтобы оценить динамику стран.")

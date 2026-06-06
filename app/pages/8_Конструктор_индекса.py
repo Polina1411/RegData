@@ -123,11 +123,6 @@ if missing_components:
 countries = load_countries_cached(str(COUNTRIES_PATH), file_version(COUNTRIES_PATH))
 country_lookup = build_country_lookup(countries)
 
-render_note(
-    "Идея страницы простая: официальный индекс считает все 12 компонент одинаково важными, "
-    "а здесь можно задать собственные веса и посмотреть, как меняется рейтинг."
-)
-
 years = sorted(efi["year"].dropna().astype(int).unique())
 default_year = int(years[-1])
 
@@ -135,7 +130,14 @@ col1, col2 = st.columns([1.2, 1])
 with col1:
     year = st.slider("Год", int(min(years)), int(max(years)), default_year)
 with col2:
-    iso_options = sorted(efi["iso3"].dropna().astype(str).unique(), key=lambda iso: country_label(iso, country_lookup))
+    year_country_df = efi[efi["year"] == year].dropna(subset=["efi_total"] + EFI_COMPONENTS)
+    iso_options = sorted(
+        year_country_df["iso3"].dropna().astype(str).unique(),
+        key=lambda iso: country_label(iso, country_lookup),
+    )
+    if not iso_options:
+        st.warning("Для выбранного года нет достаточно полных данных по странам.")
+        st.stop()
     country_iso = st.selectbox(
         "Страна для примера",
         iso_options,
@@ -183,11 +185,6 @@ with c2:
 with c3:
     st.metric("Средний сдвиг мест", f"{mean_rank_shift:.1f}")
 
-render_note(
-    "Если корреляция высокая, то твой индекс похож на официальный. "
-    "Если сдвиг мест большой, значит веса заметно меняют итоговую картину."
-)
-
 left, right = st.columns([1.2, 1])
 with left:
     st.subheader("Кастомный индекс и официальный")
@@ -221,13 +218,8 @@ with right:
 
 if not country_row.empty:
     row = country_row.iloc[0]
-    direction = "выше" if row["rank_diff"] < 0 else "ниже" if row["rank_diff"] > 0 else "на том же месте"
 
     st.subheader(country_label(country_iso, country_lookup))
-    render_note(
-        f"Для этой страны твоя формула ставит её {direction} относительно официального места. "
-        "Ниже видно, какие компоненты сильнее всего влияют на итог."
-    )
 
     c1, c2, c3 = st.columns(3)
     with c1:

@@ -27,7 +27,7 @@ python-dateutil==2.9.0.post0
 pytz==2025.2
 PyYAML==6.0.3
 referencing==0.37.0
--e git+https://github.com/Polina1411/RegData.git@f1c69d32902e2716705cec6135f1db95597367c2#egg=regdata
+-e .
 requests==2.32.5
 rpds-py==0.30.0
 six==1.17.0

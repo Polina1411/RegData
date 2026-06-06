@@ -104,12 +104,21 @@ efi = load_efi_cached(str(EFI_PATH), file_version(EFI_PATH))
 countries = load_countries_cached(str(COUNTRIES_PATH), file_version(COUNTRIES_PATH))
 country_lookup = build_country_lookup(countries)
 
-render_note(
-    "Здесь нет сложной модели: прогноз строится как продолжение среднего годового изменения компонент за последние годы. "
-    "Такой подход легко объяснить и удобно защищать."
+forecast_ready = (
+    efi.dropna(subset=EFI_COMPONENTS)
+    .groupby("iso3", as_index=False)
+    .size()
+    .rename(columns={"size": "rows_with_components"})
+)
+forecast_ready = forecast_ready[forecast_ready["rows_with_components"] >= 2]
+iso_options = sorted(
+    forecast_ready["iso3"].dropna().astype(str).unique(),
+    key=lambda iso: country_label(iso, country_lookup),
 )
 
-iso_options = sorted(efi["iso3"].dropna().astype(str).unique(), key=lambda iso: country_label(iso, country_lookup))
+if not iso_options:
+    st.warning("Нет стран с достаточной историей для прогноза.")
+    st.stop()
 
 col1, col2 = st.columns([1.2, 1])
 with col1:
@@ -156,7 +165,6 @@ country_name = country_label(country_iso, country_lookup)
 last_actual = actual_df.iloc[-1]
 first_pred = forecast_df.iloc[0]
 last_pred = forecast_df.iloc[-1]
-trend_direction = "рост" if last_pred["custom_index"] > last_actual["custom_index"] else "снижение"
 
 c1, c2, c3 = st.columns(3)
 with c1:
@@ -165,11 +173,6 @@ with c2:
     st.metric("Первый прогнозный год", f"{first_pred['custom_index']:.2f}", f"{int(first_pred['year'])}")
 with c3:
     st.metric("Конец горизонта", f"{last_pred['custom_index']:.2f}", f"{int(last_pred['year'])}")
-
-render_note(
-    f"Главный вывод: для {country_name} по текущей простой модели ожидается {trend_direction} индекса. "
-    "Сравни линию с равными весами и линию с твоими весами, чтобы увидеть влияние структуры индекса."
-)
 
 st.subheader(country_name)
 fig = px.line(

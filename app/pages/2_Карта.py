@@ -162,9 +162,10 @@ country_lookup = build_country_lookup(countries)
 geojson = load_geojson_cached(str(geojson_path), file_version(geojson_path))
 
 available_years = wdi["year"].dropna().astype(int)
+min_available_year = int(available_years.min()) if not available_years.empty else 2000
 max_available_year = int(available_years.max()) if not available_years.empty else CURRENT_YEAR
 slider_max_year = max(CURRENT_YEAR, max_available_year)
-default_year = 2019 if 2000 <= 2019 <= slider_max_year else slider_max_year
+default_year = 2019 if min_available_year <= 2019 <= slider_max_year else slider_max_year
 
 metric = st.selectbox(
     "Показатель",
@@ -172,7 +173,7 @@ metric = st.selectbox(
     format_func=metric_label,
     index=0
 )
-year = st.slider("Год", 2000, slider_max_year, default_year)
+year = st.slider("Год", min_available_year, slider_max_year, default_year)
 
 if slider_max_year > max_available_year:
     render_note(
@@ -210,7 +211,7 @@ choropleth = folium.Choropleth(
     columns=["iso3", "value"],
     key_on="feature.properties.iso3",
     fill_opacity=0.75,
-    line_opacity=0.25,
+    line_opacity=0.7,
     nan_fill_opacity=0.15,
     legend_name=f"{metric_label(metric)} ({year})",
     smooth_factor=1.5,
@@ -218,13 +219,13 @@ choropleth = folium.Choropleth(
 
 choropleth.geojson.style_function = lambda _feature: {
     "fillOpacity": 0.75,
-    "color": "#f8f4ec",
-    "weight": 0.45,
+    "color": "#4f7a6d",
+    "weight": 1.1,
 }
 choropleth.geojson.highlight_function = lambda _feature: {
     "fillOpacity": 0.92,
-    "color": "#19332d",
-    "weight": 1.5,
+    "color": "#173f35",
+    "weight": 2.2,
 }
 
 choropleth.geojson.add_child(

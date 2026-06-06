@@ -82,8 +82,7 @@ def short_summary(summary_df: pd.DataFrame) -> str:
     lowest = latest.sort_values("mean_value", ascending=True).iloc[0]["club"]
     return (
         f"На конце периода выше остальных расположен {build_club_name(int(highest))}, "
-        f"а ниже остальных — {build_club_name(int(lowest))}. "
-        "Смысл графика в том, чтобы сравнивать именно форму траекторий."
+        f"а ниже остальных — {build_club_name(int(lowest))}."
     )
 
 
@@ -131,11 +130,6 @@ summary_df, members_df = summarize_clubs(clustered_df, years)
 members_df["Страна"] = members_df["iso3"].map(lambda iso: country_label(iso, country_lookup))
 members_df["Клуб"] = members_df["club"].map(build_club_name)
 summary_df["Клуб"] = summary_df["club"].map(build_club_name)
-
-render_note(
-    "Алгоритм группирует страны по форме временного ряда. "
-    "Если у стран похожий рост, спад или стабильность, они попадают в один клуб."
-)
 
 c1, c2, c3 = st.columns(3)
 with c1:
