@@ -1,5 +1,7 @@
 # RegData - Economic Freedom Visualizer
 
+https://regdataps.ru
+
 ### Оглавление
 - [О проекте](#о-проекте)
 - [Для пользователя](#для-пользователя)
